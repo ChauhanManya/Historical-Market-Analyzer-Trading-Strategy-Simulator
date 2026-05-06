@@ -35,34 +35,40 @@ StockBST::BSTNode* StockBST::searchHelper(BSTNode* node, double key) const {
     else
         searchHelper(node->right, key);
 }
-void StockBST::rangesearchHelper(StockBST::BSTNode* node, double low, double high, vector<StockBST::BSTNode*>& results) const;
-void StockBST::inorderHelper(StockBST::BSTNode* node)  const{ //left -> root -> right
+void StockBST::rangeSearchHelper(BSTNode* node, double low, double high, vector<StockBST::BSTNode*>& results) const{
+    if(node->key >= low&& node->key <= high){
+        results.push_back(node);
+    }
+    rangeSearchHelper(node->left, low, high, results);
+    rangeSearchHelper(node->right, low, high, results);
+}
+void StockBST::inorderHelper(BSTNode* node)  const{ //left -> root -> right
     if(!node) return;
     cout << "Node:  " << node->key;
     inorderHelper(node->left);
     cout << "Node:  " << node->key;
     inorderHelper(node->right);
 }
-void StockBST::preorderHelper(StockBST::BSTNode* node) const{ //root -> left -> right
+void StockBST::preorderHelper(BSTNode* node) const{ //root -> left -> right
     if(!node) return;
     cout << "Node:  " << node->key;
     preorderHelper(node->left);
     preorderHelper(node->right);
 }
-void StockBST::postorderHelper(StockBST::BSTNode* node) const{//left -> right -> root
+void StockBST::postorderHelper(BSTNode* node) const{//left -> right -> root
         if(!node) return;
         postorderHelper(node->left);
         postorderHelper(node->right);
         cout << "Node:  " << node->key;
 }
-int  StockBST::heightHelper(StockBST::BSTNode* node)   const{
+int  StockBST::heightHelper(BSTNode* node)   const{
     int suml = 1, sumr =1;
     if(!node) return suml>sumr ? suml :  sumr;
     suml += heightHelper(node->left);
     sumr += heightHelper(node->right);
 
 }
-void StockBST::clearHelper(StockBST::BSTNode* node){
+void StockBST::clearHelper(BSTNode* node){
     if(!node) return;
     clearHelper(node->left);
     clearHelper(node->right);
@@ -78,8 +84,11 @@ StockBST::BSTNode* StockBST::search(double key) const {// Return pointer to a no
 void StockBST::insert(const string& ticker, double key, int year = 0){
     insertHelper(root, ticker, key, year);
 }
-// Collect all nodes where low <= key <= high into 'results' vector.
-void rangeSearch(double low, double high, vector<BSTNode*>& results) const{}
+
+void StockBST::rangeSearch(double low, double high, vector<BSTNode*>& results) const{// Collect all nodes where low <= key <= high into 'results' vector.
+    rangeSearchHelper(root, low, high, results);
+}
+
 // Tree traversals — each prints: ticker (key) per line
 // sorted ascending by key
 void StockBST::inorder()   const{
@@ -91,6 +100,7 @@ void StockBST::preorder()  const{
 void StockBST::postorder() const{
     postorderHelper(root);
 }
+
 // Returns the number of edges on the longest root-to-leaf path. -1 if empty.
 int StockBST::getHeight() const{
         if (root == nullptr) {
@@ -111,6 +121,7 @@ StockBST::BSTNode* StockBST::findMax() const{
     }
     return curr;
 }
+
 // Frees all nodes. Resets root to nullptr.
 void StockBST::clear(){
     if (root) 
