@@ -25,7 +25,7 @@ StockBST::BSTNode* StockBST::insertHelper(BSTNode* node, const string& ticker, d
     } 
         
 }
-StockBST::BSTNode* StockBST::searchHelper(StockBST::BSTNode* node, double key) const {
+StockBST::BSTNode* StockBST::searchHelper(BSTNode* node, double key) const {
     if (node == nullptr)
         return nullptr;
     if (key == node->key)
@@ -72,17 +72,11 @@ void StockBST::clearHelper(StockBST::BSTNode* node){
 StockBST::StockBST(){
     root = nullptr;
 }
-StockBST::BSTNode* search(double key) const {// Return pointer to a node whose key exactly matches. nullptr if not found.
-    return searchHelper(key, root);
+StockBST::BSTNode* StockBST::search(double key) const {// Return pointer to a node whose key exactly matches. nullptr if not found.
+    return searchHelper(root, key);
 }
 void StockBST::insert(const string& ticker, double key, int year = 0){
-    //StockBST::BSTNode addNode(ticker, key, year);
-    StockBST::BSTNode* duplicate = insertHelper(root, ticker, key, year);
-    if(duplicate){//if duplicate exists then
-        StockBST::BSTNode* placeNode = insertHelper(duplicate, ticker, key, year);
-    }else{
-        
-    }
+    insertHelper(root, ticker, key, year);
 }
 // Collect all nodes where low <= key <= high into 'results' vector.
 void rangeSearch(double low, double high, vector<BSTNode*>& results) const{}
