@@ -1,7 +1,5 @@
-// A BST that indexes stocks by a double key (annual return % or volatility). Must contain:
-
 #include <iostream>
-#include <stdexcept>
+#include <vector>
 #include "StockBST.h"
 using namespace std;
 //gives address of duplicate
