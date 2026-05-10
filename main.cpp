@@ -155,11 +155,6 @@ void menuLoadData(StockManager<ETF>& etfManager, StockManager<Stock>& stockManag
     //           call loadFromCSV("data/SPY.csv"), add to etfManager.
     //  For AAPL/TSLA: create Stock objects, load CSV, add to stockManager.
     cout << "Which tiker to load: \n1. SPY \n2. AAPL \n3. TSLA \n4. All) " << endl
-    int input;
-    cin >> input;
-    ETF("SPY", "SPDR S&P 500 ETF", "Index", 0.0003);
-    loadFromCSV("data/SPY.csv");
-
     cout << "(TODO: implement menuLoadData)" << endl;
 }
 
@@ -202,32 +197,88 @@ void menuDisplayBST(StockBST& bst) {
 void menuAddToPortfolio(Portfolio& portfolio) {
     // TODO:
     //  Prompt for ticker, shares, price, date. Call portfolio.buyShares(...).
-    cout << "(TODO: implement menuAddToPortfolio)" << endl;
+    cout << "Enter ticker to buy:: "; 
+    string ticker;
+    cin >> ticker;
+    cout << "Enter no. of shares to be bought:: ";
+    int shares;
+    cin >> shares;
+    cout << "Enter price:: ";
+    double price;
+    cin >> price;
+    cout  << "Enter date:: ";
+    string date;
+    cin >> date;
+    portfolio.buyShares(ticker,shares,price,date);
+    //cout << "(TODO: implement menuAddToPortfolio)" << endl;
 }
 
 void menuRemoveFromPortfolio(Portfolio& portfolio) {
     // TODO:
     //  Prompt for ticker, shares, current price, date. Call portfolio.sellShares(...).
-    cout << "(TODO: implement menuRemoveFromPortfolio)" << endl;
+    cout << "Enter ticker to sell:: "; 
+    string ticker;
+    cin >> ticker;
+    cout << "Enter no. of shares to be bought:: ";
+    int shares;
+    cin >> shares;
+    cout << "Enter price:: ";
+    double price;
+    cin >> price;
+    cout  << "Enter date:: ";
+    string date;
+    cin >> date;
+    portfolio.sellShares(ticker,shares,price,date);
+    //cout << "(TODO: implement menuRemoveFromPortfolio)" << endl;
 }
 
 void menuQueueOrder(Portfolio& portfolio) {
     // TODO:
     //  Prompt for order details (ticker, type, side, target price, shares, date).
     //  Build an Order struct and call portfolio.queueOrder(order).
-    cout << "(TODO: implement menuQueueOrder)" << endl;
+    cout << "Enter ticker:: "; 
+    string ticker;
+    cin >> ticker;
+    cout  << "Enter type (LIMIT or MARKET):: ";
+    string type;
+    cin >> type;
+    cout  << "Enter side (BUY or SELL):: ";
+    string side;
+    cin >> side;
+    cout << "Enter no. of shares to be bought:: ";
+    int shares;
+    cin >> shares;
+    cout << "Enter target price:: ";
+    double price;
+    cin >> price;
+    cout  << "Enter date:: ";
+    string date;
+    cin >> date;
+    Order t;
+    t.ticker = ticker; t.type = type; t.targetPrice = price; t.submittedDate = date; t.side = side; t.shares = shares;
+    portfolio.queueOrder(t);
+    //cout << "(TODO: implement menuQueueOrder)" << endl;
 }
 
 void menuExecuteOrder(Portfolio& portfolio) {
     // TODO:
     //  Ask for the current market price and today's date.
     //  Call portfolio.executeNextOrder(currentPrice, date).
-    cout << "(TODO: implement menuExecuteOrder)" << endl;
+    cout << "Enter current market price";
+    double price;
+    cin >> price;
+    cout << "Enter today's date";
+    string date;
+    cin >> date;
+    portfolio.executeNextOrder(price, date);
+    //cout << "(TODO: implement menuExecuteOrder)" << endl;
 }
 
 void menuUndoTrade(Portfolio& portfolio) {
     // TODO: Call portfolio.undoLastTrade() and confirm to the user.
-    cout << "(TODO: implement menuUndoTrade)" << endl;
+    portfolio.undoLastTrade();
+    cout << "Last trade undone. Cash balance: $" << portfolio.getCashBalance() << "\n";
+    //cout << "(TODO: implement menuUndoTrade)" << endl;
 }
 
 void menuRunStrategy(StockManager<ETF>& etfManager, StockManager<Stock>& stockManager) {
@@ -236,7 +287,55 @@ void menuRunStrategy(StockManager<ETF>& etfManager, StockManager<Stock>& stockMa
     //  Ask for: ticker, monthlyCapital, startYear, endYear, strategy parameters.
     //  Find the asset, get its PriceHistory, create the strategy object,
     //  call strategy.backtest(...), then strategy.printResult(result).
-    cout << "(TODO: implement menuRunStrategy)" << endl;
+    cout << "\nchoose strategy (1=FixedSIP, 2=DynamicSIP, 3=GoldenCross, 4=Momentum)";
+    int choice;
+    cin >> choice;
+    cout << "Enter ticker :: "; 
+    string ticker;
+    cin >> ticker;
+    cout << "Enter monthly capital:: ";
+    double monthlyCapital;
+    cin >> monthlyCapital;
+    cout << "Enter start Year:: ";
+    int startYear;
+    cin >> startYear;
+    cin >> monthlyCapital;
+    cout << "Enter end Year:: ";
+    int endYear;
+    cin >> endYear;
+    
+    PriceHistory* history = nullptr;
+    Stock* stock = stockManager.findByTicker(ticker);
+    if (stock != nullptr) {
+        history = stock->getHistory();
+    } else {
+        ETF* etf = etfManager.findByTicker(ticker);
+        if (etf != nullptr) history = etf->getHistory();
+    }
+    switch (choice){
+        case 1: 
+            FixedSIPStrategy fixedSIP;
+            SimResult result = fixedSIP.backtest(history, monthlyCapital, startYear, endYear);
+            fixedSIP.printResult(result);
+            break;
+        case 2:
+            cout << "\nEnter dip Threshold:: ";
+            double dipThreshold;
+            cin >> dipThreshold;
+            cout << "\nEnter rally Threshold:: ";
+            double rallyThreshold;
+            cin >> rallyThreshold;
+            cout << "\nEnter multiplier:: ";
+            double multiplier;
+            cin >> multiplier;
+            DynamicSIPStrategy dynamicSIP(dipThreshold, rallyThreshold, multiplier);
+            SimResult result = dynamicSIP.backtest(history, monthlyCapital, startYear, endYear);
+            dynamicSIP.printResult(result);
+            break;
+        case 3:
+            
+    }
+    //cout << "(TODO: implement menuRunStrategy)" << endl;
 }
 
 void menuCompareStrategies(StockManager<ETF>& etfManager) {
