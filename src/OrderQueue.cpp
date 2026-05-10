@@ -14,7 +14,8 @@ OrderQueue::~OrderQueue() {
 }
 
 void OrderQueue::enqueue(const Order& order) {
-    QueueNode* newNode = new QueueNode(order);
+    QueueNode* newNode;
+    newNode->data = order;
 
     if (isEmpty()) {
         front = back = newNode;
