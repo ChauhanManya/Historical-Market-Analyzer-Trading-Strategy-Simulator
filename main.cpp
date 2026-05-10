@@ -2,8 +2,8 @@
  * ESE 224 – Final Project: StockSim
  * Historical Market Analyzer & Trading Strategy Simulator
  *
- * Student Name : ___________________________
- * Student ID   : ___________________________
+ * Student Name : Manya Chauhan
+ * Student ID   : 115953536
  *
  * Instructions:
  *   1. Implement all classes listed in the header files under include/.
@@ -23,23 +23,23 @@
 #include <limits>
 
 // Include all your headers here once implemented
-#include "include/FinancialAsset.h"
-#include "include/PriceNode.h"
-#include "include/PriceHistory.h"
-#include "include/CSVParser.h"
-#include "include/Stock.h"
-#include "include/ETF.h"
-#include "include/CircularQueue.h"
-#include "include/TradeStack.h"
-#include "include/OrderQueue.h"
-#include "include/StockBST.h"
-#include "include/Portfolio.h"
-#include "include/TradingStrategy.h"
-#include "include/FixedSIPStrategy.h"
-#include "include/DynamicSIPStrategy.h"
-#include "include/GoldenCrossStrategy.h"
-#include "include/MomentumStrategy.h"
-#include "include/StockManager.h"
+#include "FinancialAsset.h"
+#include "PriceNode.h"
+#include "PriceHistory.h"
+#include "CSVParser.h"
+#include "Stock.h"
+#include "ETF.h"
+#include "CircularQueue.h"
+#include "TradeStack.h"
+#include "OrderQueue.h"
+#include "StockBST.h"
+#include "Portfolio.h"
+#include "TradingStrategy.h"
+#include "FixedSIPStrategy.h"
+#include "DynamicSIPStrategy.h"
+#include "GoldenCrossStrategy.h"
+#include "MomentumStrategy.h"
+#include "StockManager.h"
 
 using namespace std;
 
@@ -154,6 +154,12 @@ void menuLoadData(StockManager<ETF>& etfManager, StockManager<Stock>& stockManag
     //  For SPY: create a new ETF("SPY", "SPDR S&P 500 ETF", "Index", 0.0003),
     //           call loadFromCSV("data/SPY.csv"), add to etfManager.
     //  For AAPL/TSLA: create Stock objects, load CSV, add to stockManager.
+    cout << "Which tiker to load: \n1. SPY \n2. AAPL \n3. TSLA \n4. All) " << endl
+    int input;
+    cin >> input;
+    ETF("SPY", "SPDR S&P 500 ETF", "Index", 0.0003);
+    loadFromCSV("data/SPY.csv");
+
     cout << "(TODO: implement menuLoadData)" << endl;
 }
 

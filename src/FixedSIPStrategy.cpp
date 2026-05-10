@@ -6,8 +6,6 @@
 #include <iostream>
 using namespace std;
 
-
-
 SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear){
     SimResult s;
     s.strategyName = getName();
