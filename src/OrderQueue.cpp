@@ -1,8 +1,9 @@
-#include "../include/OrderQueue.h"
+#include "OrderQueue.h"
+#include <iostream>
 
 OrderQueue::OrderQueue() {
-    frontNode = nullptr;
-    rearNode = nullptr;
+    front = nullptr;
+    back = nullptr;
     size = 0;
 }
 
@@ -16,11 +17,11 @@ void OrderQueue::enqueue(const Order& order) {
     QueueNode* newNode = new QueueNode(order);
 
     if (isEmpty()) {
-        frontNode = rearNode = newNode;
+        front = back = newNode;
     }
     else {
-        rearNode->next = newNode;
-        rearNode = newNode;
+        back->next = newNode;
+        back = newNode;
     }
 
     size++;
@@ -31,13 +32,13 @@ Order OrderQueue::dequeue() {
         return {"", "", "", 0.0, 0, ""};
     }
 
-    QueueNode* temp = frontNode;
+    QueueNode* temp = front;
     Order order = temp->data;
 
-    frontNode = frontNode->next;
+    front = front->next;
 
-    if (frontNode == nullptr) {
-        rearNode = nullptr;
+    if (front == nullptr) {
+        back = nullptr;
     }
 
     delete temp;
@@ -51,11 +52,11 @@ Order OrderQueue::peek() const {
         return {"", "", "", 0.0, 0, ""};
     }
 
-    return frontNode->data;
+    return front->data;
 }
 
 bool OrderQueue::isEmpty() const {
-    return frontNode == nullptr;
+    return front == nullptr;
 }
 
 int OrderQueue::getSize() const {
@@ -63,7 +64,7 @@ int OrderQueue::getSize() const {
 }
 
 void OrderQueue::printAll() const {
-    QueueNode* current = frontNode;
+    QueueNode* current = front;
 
     while (current != nullptr) {
         cout << current->data.ticker
