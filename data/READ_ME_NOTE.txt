@@ -1,0 +1,2 @@
+Files: AAPL, SPY, and TSLA were downlaoded from another webiste NOT yahoo.finance as that required a premium option.
+The formatting is mostly the same but there was no adjusted closing price, so the new adjusted closing price is a copy of the closing price.
