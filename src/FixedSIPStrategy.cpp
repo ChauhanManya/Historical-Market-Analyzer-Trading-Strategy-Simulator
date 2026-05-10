@@ -31,16 +31,27 @@ SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapita
         // First trading day of this (year, month)
         if (year != lastPurchaseYear || month != lastPurchaseMonth) {
             int shares = (int)(monthlyCapital / p->close);
-            if (shares > 0) {
-                owner.buyShares("AMZN", shares, p->close, p->date);
-                s.totalInvested += monthlyCapital;
-                s.totalTrades++;
-            }
+                   
+            owner.buyShares("AMZN", shares, p->close, p->date);
+            owner.buyShares("APPL", shares, p->close, p->date);
+            owner.buyShares("TSLA", shares, p->close, p->date);
+            owner.buyShares("SPY", shares, p->close, p->date);
+            owner.buyShares("SPX", shares, p->close, p->date);
+            owner.buyShares("NVidia_stock_history", shares, p->close, p->date);
+            s.totalInvested += monthlyCapital;
+            s.totalTrades++;
+            
             lastPurchaseYear  = year;
             lastPurchaseMonth = month;
         }
 
-        owner.updatePrice("AMZN", p->close);
+        owner.updatePrice("AMZN", p->close);   
+        owner.updatePrice("AAPL", p->close); 
+        owner.updatePrice("TSLA", p->close);
+        owner.updatePrice("SPY", p->close);
+        owner.updatePrice("SPX", p->close);
+        owner.updatePrice("NVidia_stock_history", p->close);
+
         portfolioValues.push_back(owner.getTotalValue());
 
         p = p->next;
