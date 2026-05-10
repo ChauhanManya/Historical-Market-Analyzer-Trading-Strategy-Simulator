@@ -1,7 +1,6 @@
 #include "FixedSIPStrategy.h"
 #include "PriceHistory.h"
 #include "CSVParser.h"
-#include "Portfolio.h"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -10,52 +9,32 @@ SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapita
     SimResult s;
     s.strategyName = getName();
     s.totalInvested = 0.0;
-    s.totalTrades = 0.0;
-
-    int totalMonths = (endYear - startYear + 1) * 12;
-    Portfolio owner("Manya", totalMonths * monthlyCapital);
+    s.totalTrades = 0;
 
     vector<double> portfolioValues;
-    int lastPurchaseYear  = -1;
-    int lastPurchaseMonth = -1;
 
+    //go to startYear
     PriceNode* p = history->getHead();
-    while (p != nullptr) {
-        int year  = CSVParser::extractYear(p->date);
-        int month = CSVParser::extractMonth(p->date);
-
-        if (year < startYear || year > endYear) { p = p->next; continue; }
-
-        // First trading day of this (year, month)
-        if (year != lastPurchaseYear || month != lastPurchaseMonth) {
-            int shares = (int)(monthlyCapital / p->close);
-                   
-            owner.buyShares("AMZN", shares, p->close, p->date);
-            owner.buyShares("APPL", shares, p->close, p->date);
-            owner.buyShares("TSLA", shares, p->close, p->date);
-            owner.buyShares("SPY", shares, p->close, p->date);
-            owner.buyShares("SPX", shares, p->close, p->date);
-            owner.buyShares("NVidia_stock_history", shares, p->close, p->date);
-            s.totalInvested += monthlyCapital;
-            s.totalTrades++;
-            
-            lastPurchaseYear  = year;
-            lastPurchaseMonth = month;
-        }
-
-        owner.updatePrice("AMZN", p->close);   
-        owner.updatePrice("AAPL", p->close); 
-        owner.updatePrice("TSLA", p->close);
-        owner.updatePrice("SPY", p->close);
-        owner.updatePrice("SPX", p->close);
-        owner.updatePrice("NVidia_stock_history", p->close);
-
-        portfolioValues.push_back(owner.getTotalValue());
-
+    while( CSVParser::extractYear(p->date) != startYear)
         p = p->next;
+
+    int lastMonth = 0;
+    int sharesBought = 0;
+    //find first working day of each month
+    while(CSVParser::extractYear(p->date) <= endYear){
+        if(CSVParser::extractMonth(p->date) != lastMonth){
+            lastMonth = CSVParser::extractMonth(p->date);
+
+            int shares = monthlyCapital / p->close ;
+            sharesBought += shares;
+            s.totalInvested += shares * p->close;
+            s.totalTrades++;
+
+            portfolioValues.push_back(p->close);
+        }
     }
     
-    s.finalValue = owner.getTotalValue();
+    s.finalValue = sharesBought * p->close;
     s.totalReturn = 100*(s.finalValue - s.totalInvested)/s.totalInvested;
     s.maxDrawdown = calculateMaxDrawdown(portfolioValues);
     s.cagr = calculateCAGR(monthlyCapital, s.finalValue, endYear - startYear);

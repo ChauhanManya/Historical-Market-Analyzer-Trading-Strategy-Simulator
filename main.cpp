@@ -207,7 +207,7 @@ void menuDisplayHistory(StockManager<Stock>& stockManager, StockManager<ETF>& et
     if(e != nullptr) {
         PriceHistory* history = e->getHistory();
 
-        for(auto it = history.begin(); it != history.end(); ++it) {
+        for( it = history.begin(); it != history.end(); ++it) {
             PriceNode& node = *it;
 
             cout << node.date << " ";
