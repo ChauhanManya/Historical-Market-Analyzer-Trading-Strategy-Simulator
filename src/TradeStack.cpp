@@ -1,7 +1,9 @@
 #include "TradeStack.h"
+#include <iostream>
+using namespace std;
 
 TradeStack::TradeStack() {
-    topNode = nullptr;
+    top = nullptr;
     size = 0;
 }
 
@@ -12,10 +14,10 @@ TradeStack::~TradeStack() {
 }
 
 void TradeStack::push(const TradeRecord& record) {
-    StackNode* newNode = new StackNode(record);
-
-    newNode->next = topNode;
-    topNode = newNode;
+    StackNode* newNode;
+    newNode->data = record;
+    newNode->next = top;
+    top = newNode;
 
     size++;
 }
@@ -25,11 +27,11 @@ TradeRecord TradeStack::pop() {
         return {"", "", 0.0, 0, "", 0.0};
     }
 
-    StackNode* temp = topNode;
+    StackNode* temp = top;
 
     TradeRecord record = temp->data;
 
-    topNode = topNode->next;
+    top = top->next;
 
     delete temp;
 
@@ -43,11 +45,11 @@ TradeRecord TradeStack::peek() const {
         return {"", "", 0.0, 0, "", 0.0};
     }
 
-    return topNode->data;
+    return top->data;
 }
 
 bool TradeStack::isEmpty() const {
-    return topNode == nullptr;
+    return top == nullptr;
 }
 
 int TradeStack::getSize() const {
@@ -60,7 +62,7 @@ void TradeStack::printAll() const {
         return;
     }
 
-    StackNode* current = topNode;
+    StackNode* current = top;
 
     while (current != nullptr) {
         cout << current->data.date
