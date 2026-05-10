@@ -1,28 +1,82 @@
-// Manages a user’s stock portfolio. Must contain:
-//  vector<Position> holdings (std::vector is allowed here)
-//  OrderQueue pendingOrders
-//  TradeStack tradeHistory
-//  double cashBalance
-// Methods: - void buyShares(const string& ticker, int shares, double price,
-// const string& date) - void sellShares(const string& ticker, int shares, double
-// price, const string& date) - void undoLastTrade() — pops TradeStack and reverses
-// the transaction - void queueOrder(const Order& order) — add to OrderQueue - void
-// executeNextOrder(double currentPrice) — dequeue and execute if conditions met -
-// double getTotalValue() const - double getTotalReturn() const - void
-// printHoldings() const - void sortHoldingsByReturn() — sort vector by unrealized
-// gain/loss (use std::sort with comparator) - void sortHoldingsByTicker() — alphabetical
-
 #include <iostream>
 #include <vector>
 #include "Portfolio.h"
 using namespace std;
 
-Portfolio(const string& ownerName, double initialCash);
-void buyShares(const string& ticker, int shares, double price, const string& date);
-void sellShares(const string& ticker, int shares, double price, const string& date);
-void undoLastTrade();
-void queueOrder(const Order& order);
-void executeNextOrder(double currentPrice, const string& date);
+Portfolio::Portfolio(const string& ownerName, double initialCash): ownerName(ownerName), cashBalance(initialCash) {};
+
+void Portfolio::buyShares(const string& ticker, int shares, double price, const string& date){
+    TradeRecord t;
+    t.ticker = ticker;
+    t.price = price; //price per share
+    t.date = date;
+    t.shares = shares;
+    t.action = "BUY";
+    t.totalCost = price * shares;
+    tradeHistory.push(t);
+
+    cashBalance -= price* shares;
+
+    bool found = false;
+    int i = 0;
+
+    do
+    {
+        if (holdings[i].ticker == ticker)
+        {
+            // weighted average cost basis
+            double oldValue = holdings[i].shares * holdings[i].avgCostBasis;
+            double newValue = shares * price;
+            holdings[i].shares += shares;
+            holdings[i].avgCostBasis = (oldValue + newValue) / holdings[i].shares;
+            holdings[i].currentPrice = price;
+            found = true;
+        }
+        i++;
+    } while (i < holdings.size() && !found);
+    if(!found){
+        Position p; 
+        p.ticker = ticker;
+        p.currentPrice = price;
+        p.shares =shares;
+        p.avgCostBasis = price;
+        holdings.push_back(p);
+    }
+}
+
+void Portfolio::sellShares(const string& ticker, int shares, double price, const string& date){
+    int i=0;
+    bool found = false;
+    do{
+        if(holdings[i].ticker == ticker){
+            found = true;
+            TradeRecord t;
+            t.action = "SELL";
+            t.date = date;
+            t.price = price;
+            t.shares = shares;
+            t.ticker = ticker;
+            t.totalCost = price * shares;
+            cashBalance += price*shares;
+        }
+        i++;
+    }while( i< holdings.size() && !found)
+}
+void Portfolio::undoLastTrade(){
+    TradeRecord r = tradeHistory.pop();
+    if(r.action == "SELL"){
+        buyShares(r.ticker, r.shares, r.price, r.date);
+    }else{
+        sellShares(r.ticker, r.shares, r.price, r.date);
+    }
+}
+void Portfolio::queueOrder(const Order& order){
+    pendingOrders.enqueue(order);
+}
+void Portfolio::executeNextOrder(double currentPrice, const string& date){
+    Order o = pendingOrders.dequeue();
+    
+}
 double getTotalMarketValue() const;
 double getTotalValue() const;
 double getTotalUnrealizedReturn() const;
