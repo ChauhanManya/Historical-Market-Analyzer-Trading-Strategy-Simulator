@@ -6,6 +6,11 @@ using namespace std;
 Portfolio::Portfolio(const string& ownerName, double initialCash): ownerName(ownerName), cashBalance(initialCash) {};
 
 void Portfolio::buyShares(const string& ticker, int shares, double price, const string& date){
+    if (cashBalance  < price* shares){
+        cout << "cash Balance too low for this transaction" << endl;
+        return;
+    }
+
     TradeRecord t;
     t.ticker = ticker;
     t.price = price; //price per share
@@ -19,7 +24,6 @@ void Portfolio::buyShares(const string& ticker, int shares, double price, const 
 
     bool found = false;
     int i = 0;
-
     do
     {
         if (holdings[i].ticker == ticker)
