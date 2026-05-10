@@ -30,7 +30,7 @@ void PriceHistory::append(const string& date,
                           double low,
                           double close,
                           long volume) {
-    PriceNode* newNode = new PriceNode();
+    PriceNode* newNode ;
 
     newNode->date = date;
     newNode->open = open;
