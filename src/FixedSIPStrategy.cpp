@@ -1,11 +1,12 @@
 #include "FixedSIPStrategy.h"
 #include "PriceHistory.h"
+#include "CSVParser.h"
 #include "Portfolio.h"
 #include <string>
 #include <iostream>
 using namespace std;
 
-FixedSIPStrategy::FixedSIPStrategy() {}
+
 
 SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear){
     SimResult s;
@@ -50,3 +51,4 @@ SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapita
 string FixedSIPStrategy::getName() const{
     return "FIXED SIP";
 }
+
