@@ -23,7 +23,7 @@ SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapita
 
     PriceNode* p = history->getHead();
     while (p != nullptr) {
-        int year  = extractYear(p->date);
+        int year  = CSVParser::extractYear(p->date);
         int month = extractMonth(p->date);
 
         if (year < startYear || year > endYear) { p = p->next; continue; }

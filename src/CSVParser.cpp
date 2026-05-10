@@ -1,4 +1,4 @@
-#include "../include/CSVParser.h"
+#include "CSVParser.h"
 #include <fstream>
 #include <sstream>
 #include <vector>
