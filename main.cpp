@@ -200,7 +200,21 @@ void menuDisplayHistory(StockManager<Stock>& stockManager, StockManager<ETF>& et
     //  Ask user for a ticker. Find it in stockManager or etfManager.
     //  Ask how many records to display (or "all").
     //  Use the PriceHistory forward Iterator to print records.
-    cout << "(TODO: implement menuDisplayHistory)" << endl;
+    cout << "\nEnter ticker:: "; string ticker ; cin >> ticker;
+    cout << "\nHow many records to display? \n1. specific amount \n2.all";;
+    cout << "Choice:: " ; string choice; cin >> choice;
+    ETF* e = etfManager.findByTicker(ticker);
+    if(e != nullptr) {
+        PriceHistory* history = e->getHistory();
+
+        for(auto it = history.begin(); it != history.end(); ++it) {
+            PriceNode& node = *it;
+
+            cout << node.date << " ";
+            cout << node.close << endl;
+        }
+    }
+    //cout << "(TODO: implement menuDisplayHistory)" << endl;
 }
 
 void menuSearchByDate(StockManager<Stock>& stockManager, StockManager<ETF>& etfManager) {
@@ -214,21 +228,58 @@ void menuBSTRangeSearch(StockBST& bst) {
     // TODO:
     //  Ask for a low and high return % value.
     //  Call bst.rangeSearch(low, high, results) and print each result.
-    cout << "(TODO: implement menuBSTRangeSearch)" << endl;
+    cout << "\nEnter low value:: ";
+    double low; cin >> low;
+    cout << "\nEnter high value:: ";
+    double high; cin >> high;
+    vector<StockBST::BSTNode*> results;
+    bst.rangeSearch(low, high, results);
+    int i = 0;
+    cout << "Ticker | Key | Year" << endl; 
+    do{
+        cout << results[i]->ticker << results[i]->key << results[i]->year << endl;
+        i++;
+    }while(i < results.size());
+    
+    //cout << "(TODO: implement menuBSTRangeSearch)" << endl;
 }
 
 void menuInsertIntoBST(StockBST& bst, StockManager<Stock>& stockManager) {
     // TODO:
     //  Ask for a ticker and a year.
     //  Find the stock, compute calculateAnnualReturn(year), insert into BST.
-    cout << "(TODO: implement menuInsertIntoBST)" << endl;
+    //cout << "(TODO: implement menuInsertIntoBST)" << endl;
+
+    cout << "Enter ticker:: "; string ticker; cin >> ticker;
+    cout << "Enter year:: "; int year; cin >> year;
+    Stock* s = stockManager.findByTicker(ticker);
+    double key = s->calculateAnnualReturn(year);
+    bst.insert(ticker, key, year);
 }
 
 void menuDisplayBST(StockBST& bst) {
     // TODO:
     //  Ask user which traversal: inorder / preorder / postorder.
     //  Call the appropriate BST method.
-    cout << "(TODO: implement menuDisplayBST)" << endl;
+    //cout << "(TODO: implement menuDisplayBST)" << endl;
+
+    cout << "traversal: 1. inorder \n2. preorder \n3. postorder" << endl;
+    cout << "Choice:: ";
+    int choice; cin >> choice;
+    switch(choice){
+        case 1:
+            bst.inorder();
+            break;
+        case 2:
+            bst.postorder();
+            break;
+        case 3:
+            bst.preorder();
+            break;
+        default:
+            cout << "Invalid input";
+            break;
+    }
 }
 
 void menuAddToPortfolio(Portfolio& portfolio) {
