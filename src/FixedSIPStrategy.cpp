@@ -14,31 +14,38 @@ SimResult FixedSIPStrategy::backtest(PriceHistory* history, double monthlyCapita
     s.totalInvested = 0.0;
     s.totalTrades = 0.0;
 
+    int totalMonths = (endYear - startYear + 1) * 12;
+    Portfolio owner("Manya", totalMonths * monthlyCapital);
+
     vector<double> portfolioValues;
+    int lastPurchaseYear  = -1;
+    int lastPurchaseMonth = -1;
 
-    Portfolio owner("Manya", monthlyCapital);
-       
-    for( int i = startYear; i <= endYear ; i++){
-        for( int j = 1; j <= 12 ; j++){
-            string date = to_string(i) + "-" + to_string(j) + "-01";
-            PriceNode* p = history->findByDate(date);
-            if (owner.getCashBalance() < monthlyCapital){
-                cout << date << ": cash balance too low" << endl;
-                continue;
+    PriceNode* p = history->getHead();
+    while (p != nullptr) {
+        int year  = extractYear(p->date);
+        int month = extractMonth(p->date);
+
+        if (year < startYear || year > endYear) { p = p->next; continue; }
+
+        // First trading day of this (year, month)
+        if (year != lastPurchaseYear || month != lastPurchaseMonth) {
+            int shares = (int)(monthlyCapital / p->close);
+            if (shares > 0) {
+                owner.buyShares("AMZN", shares, p->close, p->date);
+                s.totalInvested += monthlyCapital;
+                s.totalTrades++;
             }
-
-            double closePrice = p->close;
-            int shares = monthlyCapital / closePrice;
-            owner.buyShares("AMZN", shares, closePrice, date);
-            
-            portfolioValues.push_back(owner.getTotalValue());
-
-            s.totalInvested+= monthlyCapital;
-            s.totalTrades++;
-
+            lastPurchaseYear  = year;
+            lastPurchaseMonth = month;
         }
-        
+
+        owner.updatePrice("AMZN", p->close);
+        portfolioValues.push_back(owner.getTotalValue());
+
+        p = p->next;
     }
+    
     s.finalValue = owner.getTotalValue();
     s.totalReturn = 100*(s.finalValue - s.totalInvested)/s.totalInvested;
     s.maxDrawdown = calculateMaxDrawdown(portfolioValues);
