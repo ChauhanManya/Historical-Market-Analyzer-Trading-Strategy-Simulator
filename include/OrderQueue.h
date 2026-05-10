@@ -7,7 +7,7 @@ using namespace std;
 // A pending trade order waiting to be executed.
 struct Order {
     string ticker;
-    string type;          // "MARKET" or "LIMIT", market order is buying at makret value ; limit order is buying at the cheapest value set by the buyer If and when the share hits that preset value
+    string type;          // "MARKET" or "LIMIT", market order is buying at makret value ; limit order is buying at the cheapest value set by the buyer  If and when the share hits that preset value
     string side;          // "BUY" or "SELL"
     double targetPrice;   // for LIMIT orders; use 0.0 for MARKET orders
     int    shares;
