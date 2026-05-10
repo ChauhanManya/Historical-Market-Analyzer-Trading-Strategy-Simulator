@@ -154,8 +154,45 @@ void menuLoadData(StockManager<ETF>& etfManager, StockManager<Stock>& stockManag
     //  For SPY: create a new ETF("SPY", "SPDR S&P 500 ETF", "Index", 0.0003),
     //           call loadFromCSV("data/SPY.csv"), add to etfManager.
     //  For AAPL/TSLA: create Stock objects, load CSV, add to stockManager.
-    cout << "Which tiker to load: \n1. SPY \n2. AAPL \n3. TSLA \n4. All) " << endl
-    cout << "(TODO: implement menuLoadData)" << endl;
+    cout << "Which ticker to load:\n1. SPY\n2. AAPL\n3. TSLA\n4. All\nChoice: ";
+    int choice;
+    cin >> choice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (choice == 1 || choice == 4) {
+        if (etfManager.findByTicker("SPY") != nullptr) {
+            cout << "SPY already loaded.\n";
+        } else {
+            ETF* spy = new ETF("SPY", "SPDR S&P 500 ETF", "Index", 0.0003);
+            if (spy->loadFromCSV("data/SPY.csv"))
+                etfManager.addAsset(spy);
+            else
+                delete spy;
+        }
+    }
+    if (choice == 2 || choice == 4) {
+        if (stockManager.findByTicker("AAPL") != nullptr) {
+            cout << "AAPL already loaded.\n";
+        } else {
+            Stock* aapl = new Stock("AAPL", "Apple Inc.", "Technology");
+            if (aapl->loadFromCSV("data/AAPL.csv"))
+                stockManager.addAsset(aapl);
+            else
+                delete aapl;
+        }
+    }
+    if (choice == 3 || choice == 4) {
+        if (stockManager.findByTicker("TSLA") != nullptr) {
+            cout << "TSLA already loaded.\n";
+        } else {
+            Stock* tsla = new Stock("TSLA", "Tesla Inc.", "Automotive");
+            if (tsla->loadFromCSV("data/TSLA.csv"))
+                stockManager.addAsset(tsla);
+            else
+                delete tsla;
+        }
+    }
+    //cout << "(TODO: implement menuLoadData)" << endl;
 }
 
 void menuDisplayHistory(StockManager<Stock>& stockManager, StockManager<ETF>& etfManager) {
@@ -312,29 +349,59 @@ void menuRunStrategy(StockManager<ETF>& etfManager, StockManager<Stock>& stockMa
         ETF* etf = etfManager.findByTicker(ticker);
         if (etf != nullptr) history = etf->getHistory();
     }
-    switch (choice){
-        case 1: 
+    switch (choice) {
+        case 1: {
             FixedSIPStrategy fixedSIP;
             SimResult result = fixedSIP.backtest(history, monthlyCapital, startYear, endYear);
             fixedSIP.printResult(result);
             break;
-        case 2:
-            cout << "\nEnter dip Threshold:: ";
+        }
+        case 2: {
+            cout << "\nEnter dip threshold: ";
             double dipThreshold;
             cin >> dipThreshold;
-            cout << "\nEnter rally Threshold:: ";
+            cout << "\nEnter rally threshold: ";
             double rallyThreshold;
             cin >> rallyThreshold;
-            cout << "\nEnter multiplier:: ";
+            cout << "\nEnter multiplier: ";
             double multiplier;
             cin >> multiplier;
             DynamicSIPStrategy dynamicSIP(dipThreshold, rallyThreshold, multiplier);
             SimResult result = dynamicSIP.backtest(history, monthlyCapital, startYear, endYear);
             dynamicSIP.printResult(result);
             break;
-        case 3:
-            
-    }
+        }
+        case 3: {
+            cout << "\nEnter momentum threshold: ";
+            double momentumThreshold;
+            cin >> momentumThreshold;
+            cout << "\nEnter lookback days: ";
+            int lookbackDays;
+            cin >> lookbackDays;
+            MomentumStrategy momentum(momentumThreshold, lookbackDays);
+            SimResult result = momentum.backtest(history, monthlyCapital, startYear, endYear);
+            momentum.printResult(result);
+            break;
+        }
+        case 4: {
+            cout << "Enter short window (default 50): ";
+            char answer;
+            int shortWindow = 50;
+            int longWindow  = 200;
+            cout << "Do you want custom windows? (Y/N): ";
+            cin >> answer;
+            if (answer == 'Y') {
+                cout << "\nEnter short window: ";
+                cin >> shortWindow;
+                cout << "\nEnter long window: ";
+                cin >> longWindow;
+            }
+            GoldenCrossStrategy golden(shortWindow, longWindow);
+            SimResult result = golden.backtest(history, monthlyCapital, startYear, endYear);
+            golden.printResult(result);
+            break;
+        }
+    }     
     //cout << "(TODO: implement menuRunStrategy)" << endl;
 }
 
