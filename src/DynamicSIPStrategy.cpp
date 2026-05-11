@@ -1,7 +1,6 @@
 #include "DynamicSIPStrategy.h"
 #include "CSVParser.h"
 #include "CircularQueue.h"
-#include "Portfolio.h"
 #include <math.h>
 #include <vector>
 #include <sstream>
@@ -16,11 +15,15 @@ string DynamicSIPStrategy::getName() const {
 }
 
 SimResult DynamicSIPStrategy::backtest(PriceHistory* history, double monthlyCapital, int startYear, int endYear) {
-    SimResult result;
-    Portfolio owner("Manya",monthlyCapital*12 );
-    result.strategyName = getName();
- 
+    SimResult s;
+    s.strategyName = getName();
+    s.totalInvested = 0.0;
+    s.totalTrades = 0;
+
+    double annualCapital = 12* monthlyCapital;
+    
     CircularQueue recentPrices(365);
+    
     //load 12 month data from before the start date 
     PriceNode* curr = history->getHead();
     double high = pow(2,-53), low = pow(2,53);
@@ -38,54 +41,42 @@ SimResult DynamicSIPStrategy::backtest(PriceHistory* history, double monthlyCapi
     vector<double> portfolioValues;
     int lastMonth = 0;
     double thisMonthBudget, lastMonthBudget;
-
-    //curr = history->getHead();
-
+    int sharesBought;
     while (curr) {
         int year = CSVParser::extractYear(curr->date);
         int month = CSVParser::extractMonth(curr->date);
 
-        if (year >= startYear && year <= endYear) {
+        if (year <= endYear) {
             recentPrices.enqueue(curr->close);
 
             if (month != lastMonth) {
-                result.totalInvested += monthlyCapital;
-                double average = recentPrices.getAverage();
-                if ((high - curr->close) / high * 100 >= dipThreshold){ // dip
-                    thisMonthBudget = monthlyCapital * multiplier;
-                    if (thisMonthBudget > owner.getCashBalance()) 
-                        thisMonthBudget = owner.getCashBalance();
-                    owner.buyShares();
+                int shares;
+                lastMonth = month;
+                if (100*(high - curr->close) / high>= dipThreshold){ // dip -> market is on sale --buy more
+                    thisMonthBudget = (annualCapital/12) * multiplier;
+                    
+                }else if(100*(low - curr->close)/low >= rallyThreshold){//price is too high -> buy less
+                    thisMonthBudget = (annualCapital/12) * 0.5;
                 }
-               
-                    shares += thisMonthBudget / curr->close;
-                    cashReserve -= thisMonthBudget;
-                    result.totalTrades++;
-                
-
+                else {
+                    thisMonthBudget = (annualCapital/12);
+                }
+                shares = thisMonthBudget / curr->close;
+                sharesBought += shares;
+                s.totalInvested += shares * curr->close;
+                s.totalTrades++;
+                annualCapital -= thisMonthBudget;
+                s.totalTrades++;
+                portfolioValues.push_back(curr->close);
             }
-
-            portfolioValues.push_back();
         }
-
         curr = curr->next;
     }
 
+    s.finalValue = sharesBought * curr->close;
+    s.totalReturn = ((s.finalValue - s.totalInvested)/ s.totalInvested) * 100.0;
+    s.cagr = calculateCAGR(s.totalInvested, s.finalValue,endYear - startYear);
+    s.maxDrawdown = calculateMaxDrawdown(portfolioValues);
 
-
-    result.finalValue = shares * lastClose;
-
-    
-        result.totalReturn =
-            ((result.finalValue - result.totalInvested)
-             / result.totalInvested) * 100.0;
-    
-
-    result.cagr = calculateCAGR(result.totalInvested,
-                                result.finalValue,
-                                endYear - startYear);
-
-    result.maxDrawdown = calculateMaxDrawdown(portfolioValues);
-
-    return result;
+    return s;
 }
